@@ -1,0 +1,31 @@
+function addToOrder(button) {
+    var menuContent = button.parentNode;
+    var itemName = menuContent.getElementsByTagName('h5')[0].textContent;
+    var itemPrice = parseFloat(menuContent.getElementsByTagName('span')[0].innerText.replace('$', ''));
+    var quantity = menuContent.getElementsByClassName('quantitySelect')[0].value;
+
+    if (quantity >= 1 && quantity <= 10) {
+        var subtotal = itemPrice * quantity;
+
+        var cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart.push({ itemName, itemPrice, quantity });
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        alert(quantity + " x " + itemName + " added to order!");
+
+        displayOrder();
+
+        fetch('http://localhost:8080/data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ subtotal })
+        })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+    } else {
+        alert("Please select a quantity between 1 and 10.");
+    }
+}
